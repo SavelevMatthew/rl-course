@@ -78,9 +78,9 @@ env = gym.make("Taxi-v3")
 agent = Agent(env.observation_space.n, env.action_space.n)
 
 episode_n = 1000
-session_n = 100
-session_len = 15
-q_param = 0.9
+session_n = 200
+session_len = 600
+q_param = 0.25
 
 for episode in range(episode_n):
     sessions = [get_session(env, agent, session_len) for _ in range(session_n)]
