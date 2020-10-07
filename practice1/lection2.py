@@ -35,7 +35,7 @@ def on_execute():
     env = gym.make('Taxi-v3').env
     agent = Agent(env.observation_space.n, env.action_space.n)
     print('*' * 64)
-    alpha, gamma, epsilon, episodes, steps = .1, .6, .1, 10000, 100
+    alpha, gamma, epsilon, episodes, steps = .3, .6, .1, 10000, 100
     print(f'Training with parameters: \n\talpha: {alpha}, \n\tgamma: {gamma},'
           f' \n\tepsilon: {epsilon}')
     print(f'Total episodes: {episodes}, steps allowed: {steps}')
@@ -49,11 +49,16 @@ def on_execute():
             action = agent.get_action(env, state, epsilon)
             next_state, reward, done, _ = env.step(action)
 
-            # Policy сглаживание
             old_value = agent.q_table[state, action]
             next_max = np.max(agent.q_table[next_state])
+
+            # Usual update
+            # new_value = reward + gamma * next_max
+
+            # Policy сглаживание
             new_value = (1 - alpha) * old_value + alpha * (
                         reward + gamma * next_max)
+
             agent.q_table[state, action] = new_value
 
             if reward == -10:
