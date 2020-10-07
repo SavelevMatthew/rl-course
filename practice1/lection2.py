@@ -1,5 +1,5 @@
 import gym
-import random
+import time
 import numpy as np
 from IPython.display import clear_output
 
@@ -17,6 +17,18 @@ class Agent:
 
     def make_step(self, state):
         return np.argmax(self.q_table[state])
+
+
+def print_frames(frames):
+    for i, frame in enumerate(frames):
+        clear_output(wait=True)
+        print(frame['frame'])
+        print(f"Episode: {frame['episode']}")
+        print(f"Timestep: {i + 1}")
+        print(f"State: {frame['state']}")
+        print(f"Action: {frame['action']}")
+        print(f"Reward: {frame['reward']}")
+        time.sleep(1)
 
 
 def on_execute():
@@ -99,6 +111,9 @@ def on_execute():
     print(f"Average penalties per episode: {total_penalties / episodes}")
     print(f"Average reward per episode: {total_reward / episodes}")
     print(f'Total finished tasks: {total_done}')
+    answer = input('Would you like to print frames? [y/n]: ').lower()
+    if answer.startswith('y'):
+        print_frames(frames)
 
 
 if __name__ == '__main__':
