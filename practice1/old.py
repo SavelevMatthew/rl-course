@@ -8,6 +8,7 @@ class Agent:
         self.state_n = state_n
         self.action_n = action_n
         self.policy = np.ones((state_n, action_n)) / action_n
+        self.lr = 0.1
 
     def get_action(self, state):
         prob = self.policy[state]
@@ -27,7 +28,7 @@ class Agent:
             else:
                 new_policy[state] /= sum(new_policy[state])
 
-        self.policy = new_policy
+        self.policy = (1 - self.lr) * self.policy + self.lr * new_policy
 
         return None
 
@@ -76,15 +77,17 @@ def get_elite_sessions(sessions, q_param):
 env = gym.make("Taxi-v3")
 agent = Agent(env.observation_space.n, env.action_space.n)
 
-episode_n = 50
-session_n = 10
-session_len = 100
+episode_n = 1000
+session_n = 100
+session_len = 15
 q_param = 0.9
 
 for episode in range(episode_n):
     sessions = [get_session(env, agent, session_len) for _ in range(session_n)]
 
     mean_total_reward = np.mean([session['total_reward'] for session in sessions])
+    # states = [session['states'] for session in sessions]
+    # print(f'states = {states}')
     print('mean_total_reward = ', mean_total_reward)
 
     elite_sessions = get_elite_sessions(sessions, q_param)
