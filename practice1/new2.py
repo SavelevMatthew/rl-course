@@ -1,11 +1,9 @@
 import gym
 import numpy as np
 from itertools import groupby
-import pickle
 
 
-class Cross_Entropy:
-
+class CrossEntropy:
     def __init__(self, env):
 
         self.env = env
@@ -82,7 +80,6 @@ class Cross_Entropy:
         return new_policy
 
     def loop(self, n_epochs, n_sessions, percentile, learning_rate):
-
         policy = np.ones([self.n_states, self.n_actions]) / self.n_actions
 
         for i in range(n_epochs):
@@ -100,24 +97,26 @@ class Cross_Entropy:
 
             policy = learning_rate * new_policy + (1 - learning_rate) * policy
 
-            print(i)
+            print(f'Epoch No: {i+1}, AVG reward: {sum(rewards_batch) / len(rewards_batch)}')
 
         return policy
 
 
 if __name__ == "__main__":
-    n_epochs = 100
-    n_sessions = 250
+    epochs = 100
+    sessions = 250
     percentile = 70
-    learning_rate = 0.5
+    lr = 0.2
 
     # create environment
     env = gym.make("Taxi-v3")
 
-    CEM = Cross_Entropy(env)
-    policy = CEM.loop(n_epochs, n_sessions, percentile, learning_rate)
+    CEM = CrossEntropy(env)
+    print(f'Training new model: \n\tepochs: {epochs},\n\t'
+          f'sessions: {sessions},\n\tpercentile: {percentile}, \n\tlr: {lr}')
+    policy = CEM.loop(epochs, sessions, percentile, lr)
 
-    print("TRY THE NEW POLICY")
+    print("Е")
 
     # try out the policy
     s = env.reset()
