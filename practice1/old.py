@@ -4,11 +4,11 @@ import numpy as np
 
 
 class Agent:
-    def __init__(self, state_n, action_n):
+    def __init__(self, state_n, action_n, lr):
         self.state_n = state_n
         self.action_n = action_n
         self.policy = np.ones((state_n, action_n)) / action_n
-        self.lr = 0.1
+        self.lr = lr
 
     def get_action(self, state):
         prob = self.policy[state]
@@ -75,7 +75,7 @@ def get_elite_sessions(sessions, q_param):
 
 
 env = gym.make("Taxi-v3")
-agent = Agent(env.observation_space.n, env.action_space.n)
+agent = Agent(env.observation_space.n, env.action_space.n, 1)
 
 episode_n = 1000
 session_n = 200
@@ -88,7 +88,8 @@ for episode in range(episode_n):
     mean_total_reward = np.mean([session['total_reward'] for session in sessions])
     # states = [session['states'] for session in sessions]
     # print(f'states = {states}')
-    print('mean_total_reward = ', mean_total_reward)
+    if episode % 10 == 9 or episode == 0:
+        print(f'Epoch: {episode+1}, mean_total_reward: {mean_total_reward}')
 
     elite_sessions = get_elite_sessions(sessions, q_param)
 
