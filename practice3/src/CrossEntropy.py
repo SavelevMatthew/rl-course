@@ -74,12 +74,12 @@ def get_session(env, agent, session_len, visual=False):
 
 def get_elite_sessions(sessions, q_param):
 
-    total_rewards = np.array([session['modified_reward'] for session in sessions])
+    total_rewards = np.array([session['total_reward'] for session in sessions])
     quantile = np.quantile(total_rewards, q_param)
 
     elite_sessions = []
     for session in sessions:
-        if session['modified_reward'] > quantile:
+        if session['total_reward'] > quantile:
             elite_sessions.append(session)
 
     return elite_sessions
@@ -90,7 +90,7 @@ agent = CrossEntropyAgent(2, 3)
 
 episode_n = 100
 session_n = 200
-session_len = 500
+session_len = 6000
 q_param = 0.8
 gamma = 0.7
 
