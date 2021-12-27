@@ -8,9 +8,10 @@ class CrossEntropyAgent(nn.Module):
     def __init__(self, state_dim, action_n):
         super().__init__()
         self.network = nn.Sequential(
-            nn.Linear(state_dim, 100),
+            nn.Linear(state_dim, 16),
             nn.ReLU(),
-            nn.Linear(100, action_n)
+            nn.Linear(16, action_n),
+            nn.Tanh()
         )
         self.softmax = nn.Softmax()
         self.loss = nn.CrossEntropyLoss()
@@ -42,7 +43,6 @@ class CrossEntropyAgent(nn.Module):
         return None
 
 
-
 def get_session(env, agent, session_len, visual=False):
     session = {}
     states, actions = [], []
@@ -52,7 +52,10 @@ def get_session(env, agent, session_len, visual=False):
     state = env.reset()
     for _ in range(session_len):
         states.append(state)
-        action = agent.get_action(state)
+        if np.random.rand(1) < epsilon:
+            action = np.random.randint(0, 3)
+        else:
+            action = agent.get_action(state)
         actions.append(action)
 
         if visual:
@@ -88,13 +91,19 @@ def get_elite_sessions(sessions, q_param):
 env = gym.make("MountainCar-v0").env
 agent = CrossEntropyAgent(2, 3)
 
-episode_n = 100
-session_n = 200
-session_len = 6000
+episode_n = 200
+session_n = 20
+session_len = 2000
 q_param = 0.8
 gamma = 0.7
 
+epsilon = 1
+epsilon_decay = 0.05
+
+epsilon_min = 0.01
+
 for episode in range(episode_n):
+    epsilon = max(epsilon - epsilon_decay * episode, epsilon_min)
     sessions = [get_session(env, agent, session_len) for _ in range(session_n)]
 
     mean_total_reward = np.mean([session['total_reward'] for session in sessions])
@@ -105,5 +114,6 @@ for episode in range(episode_n):
 
     if len(elite_sessions) > 0:
         agent.update_policy(elite_sessions)
+
 
 get_session(env, agent, session_len, visual=True)
